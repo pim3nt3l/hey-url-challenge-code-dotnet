@@ -1,4 +1,4 @@
-﻿@model hey_url_challenge_code_dotnet.ViewModels.HomeViewModel
+﻿@model HeyUrlChallengeCodeDotnet.Models.HomeViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -21,7 +21,7 @@
                     </div>
                     <div class="row">
                         <div class="col m6 offset-m2">
-                            <input type="text" class="validate form-control" placeholder="Your original URL here"/>
+                            <input type="text" class="validate form-control" name="NewUrl" placeholder="Your original URL here" />
                         </div>
                         <div class="col m2">
                             <button type="submit" class="btn">Shorten URL</button>
@@ -46,9 +46,15 @@
         @foreach (var url in Model.Urls)
         {
             <tr>
-                <th scope="row"><a href="https://localhost:5001/urls/ABCDE">https://localhost:5001/urls/ABCDE</a></th>
-                <td><a href="https://drive.google.com/file/d/1VdLgSSMojWFb1GRoBAFX_eXy7oX2J">drive.google.com/file/d/1VdLgSS...</a></td>
-                <td><!-- Please match the same format -->Feb 24, 2021</td>
+                <th scope="row">
+                    <a href="/urls/@url.ShortUrl">@url.ShortUrl</a>
+                </th>
+                <td>
+                    <a href="@url.OriginalUrl">@url.OriginalUrl</a>
+                </td>
+                <td>
+                    @url.CreatedAt.ToString("MMM dd, yyyy")
+                </td>
                 <td>@url.Count</td>
                 <td>
                     <a href="/Show">

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using hey_url_challenge_code_dotnet.Models;
+using HeyUrlChallengeCodeDotnet.Models;
 
-namespace hey_url_challenge_code_dotnet.ViewModels
+namespace HeyUrlChallengeCodeDotnet.Models
 {
     public class ShowViewModel
     {
-        public Url Url { get; set; }
+        public UrlViewModel Url { get; set; }
         public Dictionary<string, int> DailyClicks { get; set; }
         public Dictionary<string, int> BrowseClicks { get; set; }
         public Dictionary<string, int> PlatformClicks { get; set; }

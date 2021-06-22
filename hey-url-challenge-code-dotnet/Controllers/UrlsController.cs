@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using hey_url_challenge_code_dotnet.Models;
-using hey_url_challenge_code_dotnet.ViewModels;
+using HeyUrlChallengeCodeDotnet.Models;
+using HeyUrlChallengeCodeDotnet.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Shyjus.BrowserDetection;
@@ -12,74 +12,53 @@ namespace HeyUrlChallengeCodeDotnet.Controllers
     public class UrlsController : Controller
     {
         private readonly ILogger<UrlsController> _logger;
+        private readonly IShortUrlService _shortUrlService;
         private static readonly Random getrandom = new Random();
         private readonly IBrowserDetector browserDetector;
 
-        public UrlsController(ILogger<UrlsController> logger, IBrowserDetector browserDetector)
+        public UrlsController(ILogger<UrlsController> logger, IBrowserDetector browserDetector, IShortUrlService shortUrlService)
         {
             this.browserDetector = browserDetector;
             _logger = logger;
+            _shortUrlService = shortUrlService;
         }
-
         public IActionResult Index()
         {
             var model = new HomeViewModel();
-            model.Urls = new List<Url>
-            {
-                new()
-                {
-                    ShortUrl = "ABCDE",
-                    Count = getrandom.Next(1, 10)
-                },
-                new()
-                {
-                    ShortUrl = "ABCDE",
-                    Count = getrandom.Next(1, 10)
-                },
-                new()
-                {
-                    ShortUrl = "ABCDE",
-                    Count = getrandom.Next(1, 10)
-                },
-            };
+            model.Urls = this._shortUrlService.GetAll();
             model.NewUrl = new();
             return View(model);
         }
 
         [Route("/{url}")]
-        public IActionResult Visit(string url) => new OkObjectResult($"{url}, {this.browserDetector.Browser.OS}, {this.browserDetector.Browser.Name}");
+        public IActionResult Visit(string url)
+        {
+            var model = this._shortUrlService.Get(url);
+            if (model == null) return NotFound();
+            this._shortUrlService.AddClickInfo(model.Id, this.browserDetector.Browser.OS, this.browserDetector.Browser.Name);
+            return Redirect(model.OriginalUrl);
+        }
 
         [Route("urls/{url}")]
-        public IActionResult Show(string url) => View(new ShowViewModel
+        public IActionResult Show(string url)
         {
-            Url = new Url {ShortUrl = url, Count = getrandom.Next(1, 10)},
-            DailyClicks = new Dictionary<string, int>
+            var model = this._shortUrlService.GetMetrics(url);
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Create(string newUrl)
+        {
+
+            try
             {
-                {"1", 13},
-                {"2", 2},
-                {"3", 1},
-                {"4", 7},
-                {"5", 20},
-                {"6", 18},
-                {"7", 10},
-                {"8", 20},
-                {"9", 15},
-                {"10", 5}
-            },
-            BrowseClicks = new Dictionary<string, int>
-            {
-                { "IE", 13 },
-                { "Firefox", 22 },
-                { "Chrome", 17 },
-                { "Safari", 7 },
-            },
-            PlatformClicks = new Dictionary<string, int>
-            {
-                { "Windows", 13 },
-                { "macOS", 22 },
-                { "Ubuntu", 17 },
-                { "Other", 7 },
+                this._shortUrlService.Create(newUrl);
             }
-        });
+            catch (Exception e)
+            {
+                TempData["Notice"] = e.Message;
+            }
+            return RedirectToAction("Index");
+        }
     }
 }

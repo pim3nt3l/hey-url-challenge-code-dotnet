@@ -1,3 +1,4 @@
+using HeyUrlChallengeCodeDotnet.Services;
 using HeyUrlChallengeCodeDotnet.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,6 +24,7 @@ namespace HeyUrlChallengeCodeDotnet
             services.AddBrowserDetection();
             services.AddControllersWithViews();
             services.AddDbContext<ApplicationContext>(options => options.UseInMemoryDatabase(databaseName: "HeyUrl"));
+            services.AddTransient<IShortUrlService, ShortUrlService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
