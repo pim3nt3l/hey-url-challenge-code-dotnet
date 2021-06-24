@@ -88,6 +88,29 @@ namespace tests
             response.Url.Should().Be(originalUrl); //Asset model is not null
         }
 
+         [Test]
+        public void Visit_ShouldReturns404WithInvalidUrl()
+        {
+            //arrange
+            var controller = new UrlsController(logger, browserDetector, shortUrlService);
+            var urlToCheck = "ABCDE";
+            var originalUrl = "/test";
+
+            //act
+            shortUrlService.Get(urlToCheck).Returns(new HeyUrlChallengeCodeDotnet.Data.Url()
+            {
+                Count = 1,
+                CreatedAt = DateTime.Today,
+                Id = Guid.Empty,
+                OriginalUrl = originalUrl,
+                ShortUrl = urlToCheck
+            }); //Setup service
+
+            //assert
+            var response = controller.Visit("invalid") as NotFoundResult; //Execute action
+            response.StatusCode.Should().Be(404); //Asset model is not null
+        }
+
 
     }
 }
