@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using FluentAssertions;
 using System.Linq;
 using System;
+using NSubstitute.ExceptionExtensions;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace tests
 {
@@ -88,7 +90,7 @@ namespace tests
             response.Url.Should().Be(originalUrl); //Asset model is not null
         }
 
-         [Test]
+        [Test]
         public void Visit_ShouldReturns404WithInvalidUrl()
         {
             //arrange
@@ -110,6 +112,42 @@ namespace tests
             var response = controller.Visit("invalid") as NotFoundResult; //Execute action
             response.StatusCode.Should().Be(404); //Asset model is not null
         }
+
+
+        [Test]
+        public void Create_ShouldWorks()
+        {
+            //arrange
+            var controller = new UrlsController(logger, browserDetector, shortUrlService);
+            var newUrl = "/sampleUrl";
+
+            //act
+
+            //TODO: Mock ef operations
+
+            //assert
+            var response = controller.Create(newUrl) as RedirectToActionResult;
+            response.ActionName.Should().Be("Index");
+        }
+
+        [Test]
+        public void Create_ShouldFailWhenUrlExists()
+        {
+            //arrange
+            var controller = new UrlsController(logger, browserDetector, shortUrlService);
+            var newUrl = "/sampleUrl";
+            controller.TempData = Substitute.For<ITempDataDictionary>();
+            //act
+            shortUrlService.Create(newUrl).ThrowsForAnyArgs(e => new InvalidOperationException("Exception Message"));
+            
+
+            //assert
+            var response = controller.Create(newUrl) as RedirectToActionResult;
+            response.ActionName.Should().Be("Index");
+            controller.TempData["Notice"].Should().NotBeNull();
+            controller.TempData["Notice"].Should().Be("Exception Message");
+        }
+
 
 
     }
