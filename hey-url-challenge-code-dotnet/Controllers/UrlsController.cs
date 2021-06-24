@@ -13,7 +13,6 @@ namespace HeyUrlChallengeCodeDotnet.Controllers
     {
         private readonly ILogger<UrlsController> _logger;
         private readonly IShortUrlService _shortUrlService;
-        private static readonly Random getrandom = new Random();
         private readonly IBrowserDetector browserDetector;
 
         public UrlsController(ILogger<UrlsController> logger, IBrowserDetector browserDetector, IShortUrlService shortUrlService)

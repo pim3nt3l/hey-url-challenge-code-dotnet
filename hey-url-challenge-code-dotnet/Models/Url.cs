@@ -8,6 +8,6 @@ namespace HeyUrlChallengeCodeDotnet.Models
         public string ShortUrl { get; set; }
         public string OriginalUrl { get; set; }
         public int Count { get; set; }
-        public DateTime CreatedAt { get; internal set; }
+        public DateTime CreatedAt { get; set; }
     }
 }
